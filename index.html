@@ -1,18 +1,907 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <title>Topologiya Va Metrik Fazolar</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 50px; text-align: center; }
-        .card { background: #1e293b; padding: 40px; border-radius: 12px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { color: #38bdf8; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TopologiX Pro - Metrik Fazolar va Topologiya Laboratoriyasi</title>
+  
+  <!-- KaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --accent: #818cf8;
+      --success: #34d399;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --radius: 12px;
+    }
+
+    .light-theme {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --accent: #4f46e5;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; transition: background 0.2s, color 0.2s; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 1.5rem; min-height: 100vh; }
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* Header & Navigation */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-icon { font-size: 2rem; }
+    .brand h1 { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+    .brand p { font-size: 0.8rem; color: var(--text-muted); }
+
+    .nav-tabs { display: flex; gap: 0.5rem; background: var(--bg-color); padding: 0.3rem; border-radius: 8px; border: 1px solid var(--card-border); flex-wrap: wrap; }
+    .tab-btn {
+      padding: 0.6rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+
+    .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+    .btn-icon { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+
+    /* Layout Grid */
+    .tab-content { display: none; }
+    .tab-content.active { display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; }
+    @media (max-width: 992px) { .tab-content.active { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Forms & Inputs */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 0.6rem;
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .slider-row { display: flex; align-items: center; gap: 1rem; }
+    .slider-row input[type="range"] { flex: 1; }
+
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { background: var(--primary-hover); }
+
+    /* Canvas Elements */
+    .canvas-container {
+      position: relative;
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 500px;
+      overflow: hidden;
+    }
+    canvas { background: transparent; cursor: crosshair; }
+
+    /* Results & Badges */
+    .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-success { background: rgba(52, 211, 153, 0.2); color: var(--success); border: 1px solid var(--success); }
+    .badge-danger { background: rgba(248, 113, 113, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-warning { background: rgba(251, 191, 36, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+
+    .formula-box {
+      background: var(--bg-color);
+      padding: 0.8rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--accent);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .matrix-table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.85rem; }
+    .matrix-table th, .matrix-table td { border: 1px solid var(--card-border); padding: 0.6rem; text-align: center; }
+    .matrix-table th { background: var(--bg-color); color: var(--primary); }
+
+    .check-list { list-style: none; font-size: 0.85rem; }
+    .check-list li { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Topologiya Va Metrik Fazolar</h1>
-        <p>Ushbu loyiha muvaffaqiyatli dasturlandi va lokal tizimda ishga tushirildi.</p>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <span class="brand-icon">🌐</span>
+        <div>
+          <h1>TopologiX Pro</h1>
+          <p>Metrik Fazolar, Metrik Birlik Sharlar va Chekli Topologiyalar Laboratoriyasi</p>
+        </div>
+      </div>
+      
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'tab-balls')">📐 Metrik Sharlar</button>
+        <button class="tab-btn" onclick="switchTab(this, 'tab-triangle')">🔺 Uchburchak Tengsizligi</button>
+        <button class="tab-btn" onclick="switchTab(this, 'tab-topology')">🧪 Topologiya Analizatori</button>
+        <button class="tab-btn" onclick="switchTab(this, 'tab-matrix')">📊 Masofalar Matritsasi</button>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-icon" onclick="toggleTheme()">🌙/☀️ Mavzu</button>
+      </div>
+    </header>
+
+    <!-- TAB 1: METRIC BALLS -->
+    <div id="tab-balls" class="tab-content active">
+      <div>
+        <div class="card">
+          <div class="card-title">⚙️ Metrika Sozlamalari</div>
+          
+          <div class="form-group">
+            <label>Metrika Turi $d(x,y)$:</label>
+            <select id="metricType" onchange="renderMetricBall()">
+              <option value="l2">Evklid Metrikasi ($L_2$ norm)</option>
+              <option value="l1">Manhattan / Taksometr ($L_1$ norm)</option>
+              <option value="linf">Chebyshev / Maksimum ($L_\infty$ norm)</option>
+              <option value="lp">Minkowski $p$-Metrikasi ($L_p$ norm)</option>
+              <option value="discrete">Diskret Metrika ($d_D$)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="pValGroup" style="display:none;">
+            <label>Minkowski $p$ parametri: <span id="pValDisp">3.0</span></label>
+            <div class="slider-row">
+              <input type="range" id="pParam" min="0.5" max="10" step="0.1" value="3" oninput="document.getElementById('pValDisp').innerText=this.value; renderMetricBall();">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Shar radiusi ($r$): <span id="rValDisp">1.5</span></label>
+            <div class="slider-row">
+              <input type="range" id="ballRadius" min="0.2" max="3.5" step="0.1" value="1.5" oninput="document.getElementById('rValDisp').innerText=this.value; renderMetricBall();">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label><input type="checkbox" id="showMultipleOverlay" onchange="renderMetricBall()"> Barcha metrikalarni ustma-ust solishtirish</label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📖 Metrika Formulasi</div>
+          <div id="formulaDisplay" class="formula-box"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📍 Nuqta Pozitsiyasi Tekshiruvi</div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">Kanvas ustiga bossangiz, nuqtaning shar ichida joylashuvi hisoblanadi:</p>
+          <div id="pointCheckInfo" style="font-size:0.85rem; font-weight:bold; color:var(--primary);">Nuqta tanlanmagan</div>
+        </div>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="ballCanvas" width="600" height="500"></canvas>
+      </div>
     </div>
+
+    <!-- TAB 2: TRIANGLE INEQUALITY -->
+    <div id="tab-triangle" class="tab-content">
+      <div>
+        <div class="card">
+          <div class="card-title">🔺 Aksioma Sozlamalari</div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+            A, B va C nuqtalarni sichqoncha bilan surib, uchburchak tengsizligi aksiomasini real vaqtda tekshiring:
+          </p>
+
+          <div class="form-group">
+            <label>Metrika:</label>
+            <select id="triMetricType" onchange="updateTriangle()">
+              <option value="l2">Evklid ($L_2$)</option>
+              <option value="l1">Manhattan ($L_1$)</option>
+              <option value="linf">Chebyshev ($L_\infty$)</option>
+              <option value="lp">Minkowski ($L_p, p=3$)</option>
+            </select>
+          </div>
+
+          <div id="triangleStatusCard" class="formula-box">Tekshirilmoqda...</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📏 Masofalar Natijasi</div>
+          <ul class="check-list">
+            <li>$d(A, B)$ = <strong id="distAB">0.00</strong></li>
+            <li>$d(B, C)$ = <strong id="distBC">0.00</strong></li>
+            <li>$d(A, C)$ = <strong id="distAC">0.00</strong></li>
+          </ul>
+          <hr style="border-color:var(--card-border); margin:0.8rem 0;">
+          <div style="font-size:0.85rem;">
+            Tengsizlik: <br>
+            <span id="triFormulaText" style="font-weight:bold; color:var(--primary);">$d(A,C) \le d(A,B) + d(B,C)$</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="triangleCanvas" width="600" height="500"></canvas>
+      </div>
+    </div>
+
+    <!-- TAB 3: TOPOLOGY VALIDATOR -->
+    <div id="tab-topology" class="tab-content">
+      <div>
+        <div class="card">
+          <div class="card-title">🧪 Chekli Topologiya Konstruktori</div>
+          
+          <div class="form-group">
+            <label>Chekli To'plam $X$ (vergul bilan):</label>
+            <input type="text" id="setXInput" value="a, b, c, d" oninput="analyzeTopology()">
+          </div>
+
+          <div class="form-group">
+            <label>Ochiq To'plamlar Oilasi $\tau$ (JSON / Massiv formatida):</label>
+            <textarea id="topologyInput" rows="6" style="font-family:monospace;" oninput="analyzeTopology()">[
+  [],
+  ["a"],
+  ["a", "b"],
+  ["a", "b", "c", "d"]
+]</textarea>
+          </div>
+
+          <button class="btn" onclick="analyzeTopology()">🔍 Topologiyani Tekshirish</button>
+
+          <div style="margin-top:1rem;">
+            <label style="font-size:0.8rem; color:var(--text-muted);">Tayyor Shablonlar:</label>
+            <div style="display:flex; gap:0.4rem; margin-top:0.3rem; flex-wrap:wrap;">
+              <button class="btn-icon" onclick="loadPreset('discrete')">Diskret</button>
+              <button class="btn-icon" onclick="loadPreset('indiscrete')">Indiskret</button>
+              <button class="btn-icon" onclick="loadPreset('sierpinski')">Sierpiński</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📐 Ost-to'plam Analizatori (Int & Cl)</div>
+          <div class="form-group">
+            <label>Ost-to'plam $A \subseteq X$ (vergul bilan):</label>
+            <input type="text" id="subsetAInput" value="a, c" oninput="calculateSubsetOps()">
+          </div>
+          <div id="subsetReport" style="font-size:0.85rem;" class="formula-box"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-title">📋 Aksiomalar va Xossalari Tahlili</div>
+          <div id="topologyReport">
+            <p style="color:var(--text-muted); font-size:0.85rem;">Ma'lumotlarni kiritib, tekshiring.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: DISTANCE MATRIX -->
+    <div id="tab-matrix" class="tab-content">
+      <div>
+        <div class="card">
+          <div class="card-title">🎲 Tasodifiy Nuqtalar Generatori</div>
+          
+          <div class="form-group">
+            <label>Nuqtalar soni ($N$): <span id="numPointsDisp">5</span></label>
+            <input type="range" id="numPoints" min="3" max="8" value="5" oninput="document.getElementById('numPointsDisp').innerText=this.value;">
+          </div>
+
+          <div class="form-group">
+            <label>Metrika:</label>
+            <select id="matrixMetric">
+              <option value="l2">Evklid ($L_2$)</option>
+              <option value="l1">Manhattan ($L_1$)</option>
+              <option value="linf">Chebyshev ($L_\infty$)</option>
+              <option value="lp">Minkowski ($L_p, p=3$)</option>
+              <option value="discrete">Diskret Metrika ($d_D$)</option>
+            </select>
+          </div>
+
+          <button class="btn" onclick="generateDistanceMatrix()">📊 Matritsani Hisoblash</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">ℹ️ Fazoviy Harakteristikalar</div>
+          <div id="spaceStats" style="font-size:0.85rem;">
+            - Diametr $\text{diam}(X)$: <strong id="statDiameter">-</strong><br>
+            - Eng yaqin juftlik masofasi: <strong id="statMinDist">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-title">🔢 Masofalar Matritsasi $D_{ij} = d(x_i, x_j)$</div>
+          <div id="matrixTableContainer" style="overflow-x:auto;">
+            <p style="color:var(--text-muted); font-size:0.85rem;">Matritsa hosil qilish uchun tugmani bosing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let isDark = true;
+    let selectedTestPoint = null;
+
+    function toggleTheme() {
+      isDark = !isDark;
+      document.body.classList.toggle('light-theme', !isDark);
+      renderMetricBall();
+      updateTriangle();
+    }
+
+    function switchTab(btn, tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (btn) btn.classList.add('active');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+
+      if (tabId === 'tab-balls') renderMetricBall();
+      if (tabId === 'tab-triangle') updateTriangle();
+      if (tabId === 'tab-topology') analyzeTopology();
+      
+      renderMath();
+    }
+
+    function renderMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ]
+        });
+      }
+    }
+
+    /* -------------------------------------------------------------
+       UNIVERSAL DISTANCE CALCULATOR
+    ------------------------------------------------------------- */
+    function calcDistance(p1, p2, metric, pVal = 3, scale = 1) {
+      const dx = Math.abs(p1.x - p2.x) / scale;
+      const dy = Math.abs(p1.y - p2.y) / scale;
+
+      if (metric === 'l1') return dx + dy;
+      if (metric === 'linf') return Math.max(dx, dy);
+      if (metric === 'lp') return Math.pow(Math.pow(dx, pVal) + Math.pow(dy, pVal), 1 / pVal);
+      if (metric === 'discrete') return (dx < 0.0001 && dy < 0.0001) ? 0 : 1;
+      return Math.sqrt(dx * dx + dy * dy); // l2
+    }
+
+    /* -------------------------------------------------------------
+       TAB 1: METRIC BALLS SIMULATOR
+    ------------------------------------------------------------- */
+    const ballCanvas = document.getElementById('ballCanvas');
+    const ctxBall = ballCanvas.getContext('2d');
+
+    ballCanvas.addEventListener('click', (e) => {
+      const rect = ballCanvas.getBoundingClientRect();
+      const scale = 80;
+      const center = { x: ballCanvas.width / 2, y: ballCanvas.height / 2 };
+      
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Real coordinates relative to center
+      const realX = (clickX - center.x) / scale;
+      const realY = (center.y - clickY) / scale;
+
+      selectedTestPoint = { x: clickX, y: clickY, realX, realY };
+      renderMetricBall();
+    });
+
+    function renderMetricBall() {
+      const metric = document.getElementById('metricType').value;
+      const r = parseFloat(document.getElementById('ballRadius').value);
+      const p = parseFloat(document.getElementById('pParam').value);
+      const showOverlay = document.getElementById('showMultipleOverlay').checked;
+      
+      document.getElementById('pValGroup').style.display = (metric === 'lp') ? 'block' : 'none';
+
+      // Update Formula Text with KaTeX
+      const formulas = {
+        l2: '$$d_2(x, y) = \\sqrt{|x_1-y_1|^2 + |x_2-y_2|^2}$$',
+        l1: '$$d_1(x, y) = |x_1-y_1| + |x_2-y_2|$$',
+        linf: '$$d_\\infty(x, y) = \\max(|x_1-y_1|, |x_2-y_2|)$$',
+        lp: `$$d_p(x, y) = (|x_1-y_1|^{${p}} + |x_2-y_2|^{${p}})^{1/${p}}$$`,
+        discrete: '$$d_D(x, y) = \\begin{cases} 0, & x = y \\\\ 1, & x \\neq y \\end{cases}$$'
+      };
+      document.getElementById('formulaDisplay').innerHTML = formulas[metric];
+
+      const w = ballCanvas.width;
+      const h = ballCanvas.height;
+      const center = { x: w/2, y: h/2 };
+      const scale = 80;
+
+      ctxBall.clearRect(0, 0, w, h);
+
+      // Grid Axes
+      ctxBall.strokeStyle = isDark ? '#334155' : '#cbd5e1';
+      ctxBall.lineWidth = 1;
+      
+      ctxBall.beginPath();
+      ctxBall.moveTo(0, center.y); ctxBall.lineTo(w, center.y);
+      ctxBall.moveTo(center.x, 0); ctxBall.lineTo(center.x, h);
+      ctxBall.stroke();
+
+      // Ticks
+      ctxBall.fillStyle = isDark ? '#94a3b8' : '#64748b';
+      ctxBall.font = '11px sans-serif';
+      for(let i = -3; i <= 3; i++) {
+        if(i !== 0) {
+          ctxBall.fillText(i, center.x + i*scale - 4, center.y + 14);
+          ctxBall.fillText(i, center.x - 16, center.y - i*scale + 4);
+        }
+      }
+
+      if(showOverlay) {
+        drawBallShape('l1', r, center, scale, 'rgba(251, 191, 36, 0.4)', 'rgba(251, 191, 36, 0.15)');
+        drawBallShape('l2', r, center, scale, 'rgba(56, 189, 248, 0.4)', 'rgba(56, 189, 248, 0.15)');
+        drawBallShape('linf', r, center, scale, 'rgba(248, 113, 113, 0.4)', 'rgba(248, 113, 113, 0.15)');
+      } else {
+        drawBallShape(metric, r, center, scale, '#38bdf8', 'rgba(56, 189, 248, 0.25)', p);
+      }
+
+      // Draw Center Point x_0
+      ctxBall.fillStyle = '#e11d48';
+      ctxBall.beginPath();
+      ctxBall.arc(center.x, center.y, 5, 0, Math.PI*2);
+      ctxBall.fill();
+      ctxBall.fillText("x₀ (0,0)", center.x + 8, center.y - 8);
+
+      // Draw Test Point if selected
+      if (selectedTestPoint) {
+        const ptDist = calcDistance({x: selectedTestPoint.realX, y: selectedTestPoint.realY}, {x:0, y:0}, metric, p);
+        
+        ctxBall.fillStyle = '#f59e0b';
+        ctxBall.beginPath();
+        ctxBall.arc(selectedTestPoint.x, selectedTestPoint.y, 6, 0, Math.PI*2);
+        ctxBall.fill();
+        ctxBall.fillText(`P(${selectedTestPoint.realX.toFixed(2)}, ${selectedTestPoint.realY.toFixed(2)})`, selectedTestPoint.x + 8, selectedTestPoint.y - 8);
+
+        let statusText = "";
+        if (Math.abs(ptDist - r) < 0.05) {
+          statusText = `Nuqta shar chegarasida: $d(x_0, P) = ${ptDist.toFixed(2)} \\approx r$`;
+        } else if (ptDist < r) {
+          statusText = `Nuqta shar ICHIDA ($P \\in B_r$): $d(x_0, P) = ${ptDist.toFixed(2)} < ${r}$`;
+        } else {
+          statusText = `Nuqta shar TASHQARISIDA ($P \\notin B_r$): $d(x_0, P) = ${ptDist.toFixed(2)} > ${r}$`;
+        }
+        document.getElementById('pointCheckInfo').innerHTML = statusText;
+      }
+
+      renderMath();
+    }
+
+    function drawBallShape(type, r, center, scale, strokeColor, fillColor, pVal = 3) {
+      ctxBall.strokeStyle = strokeColor;
+      ctxBall.fillStyle = fillColor;
+      ctxBall.lineWidth = 2;
+
+      ctxBall.beginPath();
+
+      if(type === 'l2') {
+        ctxBall.arc(center.x, center.y, r * scale, 0, Math.PI*2);
+      } else if(type === 'l1') {
+        const d = r * scale;
+        ctxBall.moveTo(center.x + d, center.y);
+        ctxBall.lineTo(center.x, center.y - d);
+        ctxBall.lineTo(center.x - d, center.y);
+        ctxBall.lineTo(center.x, center.y + d);
+        ctxBall.closePath();
+      } else if(type === 'linf') {
+        const d = r * scale;
+        ctxBall.rect(center.x - d, center.y - d, d * 2, d * 2);
+      } else if(type === 'lp') {
+        const steps = 200;
+        for(let i = 0; i <= steps; i++) {
+          const theta = (i / steps) * Math.PI * 2;
+          const cosT = Math.cos(theta);
+          const sinT = Math.sin(theta);
+          const rad = r / Math.pow(Math.pow(Math.abs(cosT), pVal) + Math.pow(Math.abs(sinT), pVal), 1/pVal);
+          const x = center.x + rad * cosT * scale;
+          const y = center.y - rad * sinT * scale;
+          if(i === 0) ctxBall.moveTo(x, y);
+          else ctxBall.lineTo(x, y);
+        }
+        ctxBall.closePath();
+      } else if(type === 'discrete') {
+        if(r > 1) {
+          ctxBall.rect(0, 0, ballCanvas.width, ballCanvas.height);
+        } else {
+          ctxBall.arc(center.x, center.y, 4, 0, Math.PI*2);
+        }
+      }
+
+      ctxBall.fill();
+      ctxBall.stroke();
+    }
+
+    /* -------------------------------------------------------------
+       TAB 2: TRIANGLE INEQUALITY LAB
+    ------------------------------------------------------------- */
+    const triCanvas = document.getElementById('triangleCanvas');
+    const ctxTri = triCanvas.getContext('2d');
+
+    let pts = [
+      { x: 180, y: 320, label: 'A' },
+      { x: 300, y: 120, label: 'B' },
+      { x: 420, y: 320, label: 'C' }
+    ];
+    let draggedPt = -1;
+
+    triCanvas.addEventListener('mousedown', (e) => {
+      const rect = triCanvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      pts.forEach((pt, idx) => {
+        if(Math.hypot(pt.x - mx, pt.y - my) < 20) draggedPt = idx;
+      });
+    });
+
+    triCanvas.addEventListener('mousemove', (e) => {
+      if(draggedPt !== -1) {
+        const rect = triCanvas.getBoundingClientRect();
+        pts[draggedPt].x = e.clientX - rect.left;
+        pts[draggedPt].y = e.clientY - rect.top;
+        updateTriangle();
+      }
+    });
+
+    window.addEventListener('mouseup', () => draggedPt = -1);
+
+    function updateTriangle() {
+      const metric = document.getElementById('triMetricType').value;
+
+      // Scale points for distance display
+      const dAB = calcDistance(pts[0], pts[1], metric, 3, 50);
+      const dBC = calcDistance(pts[1], pts[2], metric, 3, 50);
+      const dAC = calcDistance(pts[0], pts[2], metric, 3, 50);
+
+      document.getElementById('distAB').innerText = dAB.toFixed(2);
+      document.getElementById('distBC').innerText = dBC.toFixed(2);
+      document.getElementById('distAC').innerText = dAC.toFixed(2);
+
+      const holds = dAC <= (dAB + dBC + 0.00001);
+
+      document.getElementById('triangleStatusCard').innerHTML = holds 
+        ? `<span class="badge badge-success">✓ Aksioma Bajarildi</span> $d(A,C) \\le d(A,B) + d(B,C)$`
+        : `<span class="badge badge-danger">✕ Tengsizlik Buzildi</span>`;
+
+      ctxTri.clearRect(0, 0, triCanvas.width, triCanvas.height);
+
+      // Draw Connection lines
+      ctxTri.lineWidth = 2;
+      ctxTri.strokeStyle = '#38bdf8';
+      ctxTri.beginPath();
+      ctxTri.moveTo(pts[0].x, pts[0].y);
+      ctxTri.lineTo(pts[1].x, pts[1].y);
+      ctxTri.lineTo(pts[2].x, pts[2].y);
+      ctxTri.closePath();
+      ctxTri.stroke();
+
+      // Draw Points
+      pts.forEach(pt => {
+        ctxTri.fillStyle = '#818cf8';
+        ctxTri.beginPath();
+        ctxTri.arc(pt.x, pt.y, 8, 0, Math.PI*2);
+        ctxTri.fill();
+
+        ctxTri.fillStyle = isDark ? '#fff' : '#000';
+        ctxTri.font = 'bold 14px sans-serif';
+        ctxTri.fillText(pt.label, pt.x - 5, pt.y - 12);
+      });
+
+      renderMath();
+    }
+
+    /* -------------------------------------------------------------
+       TAB 3: FINITE TOPOLOGY VALIDATOR & SUBSET CALCULATOR
+    ------------------------------------------------------------- */
+    function parseSet(str) {
+      return Array.from(new Set(str.split(',').map(s => s.trim()).filter(s => s !== '')));
+    }
+
+    function setEquals(a, b) {
+      if (a.length !== b.length) return false;
+      const setB = new Set(b);
+      return a.every(x => setB.has(x));
+    }
+
+    function setContains(tau, subset) {
+      return tau.some(s => setEquals(s, subset));
+    }
+
+    let currentTau = [];
+    let currentX = [];
+
+    function analyzeTopology() {
+      currentX = parseSet(document.getElementById('setXInput').value);
+      
+      let tauInput = [];
+      try {
+        tauInput = JSON.parse(document.getElementById('topologyInput').value);
+        currentTau = tauInput.map(s => Array.from(new Set(s.map(el => String(el).trim()))));
+      } catch(e) {
+        document.getElementById('topologyReport').innerHTML = `<span class="badge badge-danger">JSON Sintaksis Xatosi! Format: [ [], ["a"], ["a","b"] ]</span>`;
+        return;
+      }
+
+      const strX = currentX.map(String);
+      const hasEmpty = setContains(currentTau, []);
+      const hasX = setContains(currentTau, strX);
+
+      // Check Unions
+      let unionValid = true;
+      let missingUnion = [];
+      for(let i=0; i<currentTau.length; i++) {
+        for(let j=i; j<currentTau.length; j++) {
+          const u = Array.from(new Set([...currentTau[i], ...currentTau[j]])).sort();
+          if(!setContains(currentTau, u)) {
+            unionValid = false;
+            missingUnion = u;
+            break;
+          }
+        }
+        if(!unionValid) break;
+      }
+
+      // Check Intersections
+      let intersectValid = true;
+      let missingIntersect = [];
+      for(let i=0; i<currentTau.length; i++) {
+        for(let j=i; j<currentTau.length; j++) {
+          const inter = currentTau[i].filter(x => currentTau[j].includes(x)).sort();
+          if(!setContains(currentTau, inter)) {
+            intersectValid = false;
+            missingIntersect = inter;
+            break;
+          }
+        }
+        if(!intersectValid) break;
+      }
+
+      const isTopology = hasEmpty && hasX && unionValid && intersectValid;
+
+      // Separation Axioms
+      let t0 = true, t1 = true, t2 = true;
+      if(isTopology && strX.length > 1) {
+        // T0 Kolmogorov
+        for(let i=0; i<strX.length; i++) {
+          for(let j=i+1; j<strX.length; j++) {
+            const a = strX[i], b = strX[j];
+            const separates = currentTau.some(u => (u.includes(a) && !u.includes(b)) || (u.includes(b) && !u.includes(a)));
+            if(!separates) t0 = false;
+          }
+        }
+
+        // T1 Fréchet
+        for(let i=0; i<strX.length; i++) {
+          for(let j=i+1; j<strX.length; j++) {
+            const a = strX[i], b = strX[j];
+            const aNotB = currentTau.some(u => u.includes(a) && !u.includes(b));
+            const bNotA = currentTau.some(u => u.includes(b) && !u.includes(a));
+            if(!aNotB || !bNotA) t1 = false;
+          }
+        }
+
+        // T2 Hausdorff
+        for(let i=0; i<strX.length; i++) {
+          for(let j=i+1; j<strX.length; j++) {
+            const a = strX[i], b = strX[j];
+            const disjointPair = currentTau.some(u => u.includes(a) && currentTau.some(v => v.includes(b) && u.filter(x => v.includes(x)).length === 0));
+            if(!disjointPair) t2 = false;
+          }
+        }
+      }
+
+      // Render Report
+      let html = `
+        <div style="margin-bottom:1rem;">
+          Tashxis: ${isTopology ? '<span class="badge badge-success">✓ To\'g\'ri Topologiya (\\tau)</span>' : '<span class="badge badge-danger">✕ Topologiya Emas</span>'}
+        </div>
+        <ul class="check-list">
+          <li>${hasEmpty && hasX ? '✅' : '❌'} $\\emptyset \\in \\tau$ va $X \\in \\tau$ aksiomasi</li>
+          <li>${unionValid ? '✅' : '❌'} Birlashmaga nisbatan yopiqlik ${!unionValid ? `(Yetishmaydi: {${missingUnion.join(', ')}})` : ''}</li>
+          <li>${intersectValid ? '✅' : '❌'} Kesishmaga nisbatan yopiqlik ${!intersectValid ? `(Yetishmaydi: {${missingIntersect.join(', ')}})` : ''}</li>
+        </ul>
+      `;
+
+      if(isTopology) {
+        // Calculate Closed Sets
+        const closedSets = currentTau.map(openSet => strX.filter(x => !openSet.includes(x)));
+        const formattedClosed = closedSets.map(s => `{${s.join(', ')}}`).join(', ');
+
+        html += `
+          <hr style="border-color:var(--card-border); margin:1rem 0;">
+          <div style="font-weight:bold; color:var(--primary); margin-bottom:0.5rem;">Ajratuvchanlik Aksiomalari:</div>
+          <ul class="check-list">
+            <li>${t0 ? '✅' : '❌'} $T_0$ (Kolmogorov fazosi)</li>
+            <li>${t1 ? '✅' : '❌'} $T_1$ (Fréchet fazosi)</li>
+            <li>${t2 ? '✅' : '❌'} $T_2$ (Hausdorff fazosi)</li>
+          </ul>
+          <hr style="border-color:var(--card-border); margin:1rem 0;">
+          <div style="font-weight:bold; color:var(--primary); margin-bottom:0.3rem;">Yopiq To'plamlar Oilasi $\\mathcal{F}$:</div>
+          <div style="font-size:0.8rem; font-family:monospace;">\\mathcal{F} = \\{ ${formattedClosed} \\}</div>
+        `;
+      }
+
+      document.getElementById('topologyReport').innerHTML = html;
+      calculateSubsetOps();
+      renderMath();
+    }
+
+    function calculateSubsetOps() {
+      if (!currentTau || currentTau.length === 0) return;
+
+      const setA = parseSet(document.getElementById('subsetAInput').value);
+      const strX = currentX.map(String);
+
+      // Interior Int(A): Largest open set contained in A
+      let intA = [];
+      currentTau.forEach(openSet => {
+        if (openSet.every(x => setA.includes(x))) {
+          if (openSet.length > intA.length) intA = openSet;
+        }
+      });
+
+      // Closed sets
+      const closedSets = currentTau.map(openSet => strX.filter(x => !openSet.includes(x)));
+
+      // Closure Cl(A): Smallest closed set containing A
+      let clA = strX;
+      closedSets.forEach(closedSet => {
+        if (setA.every(x => closedSet.includes(x))) {
+          if (closedSet.length < clA.length) clA = closedSet;
+        }
+      });
+
+      // Boundary Boundary(A) = Cl(A) \ Int(A)
+      const boundaryA = clA.filter(x => !intA.includes(x));
+
+      document.getElementById('subsetReport').innerHTML = `
+        <div><strong>To'plam $A$:</strong> \\{ ${setA.join(', ')} \\}</div>
+        <div><strong>Ichki qismi $\\text{Int}(A)$:</strong> \\{ ${intA.join(', ')} \\}</div>
+        <div><strong>Yopilmasi $\\text{Cl}(A)$:</strong> \\{ ${clA.join(', ')} \\}</div>
+        <div><strong>Chegarasi $\\partial A$:</strong> \\{ ${boundaryA.join(', ')} \\}</div>
+      `;
+      renderMath();
+    }
+
+    function loadPreset(type) {
+      if(type === 'discrete') {
+        document.getElementById('setXInput').value = "a, b, c";
+        document.getElementById('topologyInput').value = `[
+  [],
+  ["a"], ["b"], ["c"],
+  ["a", "b"], ["a", "c"], ["b", "c"],
+  ["a", "b", "c"]
+]`;
+      } else if(type === 'indiscrete') {
+        document.getElementById('setXInput').value = "a, b, c";
+        document.getElementById('topologyInput').value = `[
+  [],
+  ["a", "b", "c"]
+]`;
+      } else if(type === 'sierpinski') {
+        document.getElementById('setXInput').value = "0, 1";
+        document.getElementById('topologyInput').value = `[
+  [],
+  ["0"],
+  ["0", "1"]
+]`;
+      }
+      analyzeTopology();
+    }
+
+    /* -------------------------------------------------------------
+       TAB 4: DISTANCE MATRIX GENERATOR
+    ------------------------------------------------------------- */
+    function generateDistanceMatrix() {
+      const n = parseInt(document.getElementById('numPoints').value);
+      const metric = document.getElementById('matrixMetric').value;
+
+      // Random points in 2D
+      const matrixPts = [];
+      for(let i=0; i<n; i++) {
+        matrixPts.push({ x: Math.random()*10, y: Math.random()*10 });
+      }
+
+      let maxDist = 0;
+      let minDist = Infinity;
+
+      let tableHtml = `<table class="matrix-table"><thead><tr><th>x_i</th>`;
+      for(let i=0; i<n; i++) tableHtml += `<th>P${i+1}</th>`;
+      tableHtml += `</tr></thead><tbody>`;
+
+      for(let i=0; i<n; i++) {
+        tableHtml += `<tr><th>P${i+1}</th>`;
+        for(let j=0; j<n; j++) {
+          const d = calcDistance(matrixPts[i], matrixPts[j], metric, 3, 1);
+          if(i !== j) {
+            if(d > maxDist) maxDist = d;
+            if(d < minDist) minDist = d;
+          }
+          // Heatmap styling
+          const opacity = (d / 12).toFixed(2);
+          tableHtml += `<td style="background: rgba(56, 189, 248, ${opacity});">${d.toFixed(2)}</td>`;
+        }
+        tableHtml += `</tr>`;
+      }
+      tableHtml += `</tbody></table>`;
+
+      document.getElementById('matrixTableContainer').innerHTML = tableHtml;
+      document.getElementById('statDiameter').innerText = (maxDist === 0 ? "0" : maxDist.toFixed(2)) + " birlik";
+      document.getElementById('statMinDist').innerText = (minDist === Infinity ? "0" : minDist.toFixed(2)) + " birlik";
+      renderMath();
+    }
+
+    // Init on page load
+    window.onload = () => {
+      renderMetricBall();
+      updateTriangle();
+      analyzeTopology();
+    };
+  </script>
 </body>
 </html>
